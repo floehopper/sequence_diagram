@@ -94,6 +94,19 @@ describe 'js-sequence-diagrams' do
     end
   end
 
+  context 'when method is called on namespaced class' do
+    let(:block) { -> {
+      ClassA.execute(:scenario_7)
+    }}
+
+    it 'replaces double-colons with tildes' do
+      expect(output_from(&block)).to eq([
+        'ClassA->ClassA~InnerClass: class_method_1',
+        'ClassA~InnerClass-->ClassA: class_method_1'
+      ])
+    end
+  end
+
   def output_from(&block)
     tracer.trace(&block)
     events = filter.filter(tracer.events)

@@ -1,6 +1,11 @@
 require 'fixtures/class_b'
 
 class ClassA
+  class InnerClass
+    def self.class_method_1
+    end
+  end
+
   def self.execute(scenario)
     case scenario
     when :scenario_1
@@ -16,6 +21,8 @@ class ClassA
       ClassB.class_method_2
     when :scenario_6
       ClassB.class_method_3
+    when :scenario_7
+      InnerClass.class_method_1
     end
   end
 

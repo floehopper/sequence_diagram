@@ -1,8 +1,22 @@
 module SequenceDiagram
   class JsSequenceDiagramFormatter
+    class InstanceRegistry
+      def initialize
+        @classes_vs_instances = Hash.new { |h, k| h[k] = Set.new }
+      end
+
+      def register(instance)
+        @classes_vs_instances[instance.class] << instance
+      end
+
+      def number_for(instance)
+        @classes_vs_instances[instance.class].to_a.index(instance) + 1
+      end
+    end
+
     class Decorator
       class << self
-        attr_accessor :classes_vs_instances
+        attr_accessor :instance_registry
       end
 
       def initialize(object)
@@ -11,22 +25,18 @@ module SequenceDiagram
 
       def to_s
         if @object.is_a?(Class)
-          # @object.to_s.gsub('::', '~')
-          @object.to_s
+          @object.to_s.gsub('::', '~')
         else
-          # address = @object.__id__ * 2
-          # address += 0x100000000 if address < 0
-          # "#{@object.class.to_s.gsub('::', '~')}(0x#{'%x' % address})"
-          self.class.classes_vs_instances[@object.class] << @object
-          instance_number = self.class.classes_vs_instances[@object.class].to_a.index(@object) + 1
-          "#{@object.class.to_s}(#{instance_number})"
+          self.class.instance_registry.register(@object)
+          instance_number = self.class.instance_registry.number_for(@object)
+          "#{@object.class.to_s.gsub('::', '~')}(#{instance_number})"
         end
       end
     end
 
     def initialize(io)
       @io = io
-      Decorator.classes_vs_instances = Hash.new { |h, k| h[k] = Set.new }
+      Decorator.instance_registry = InstanceRegistry.new
     end
 
     def write(events)
