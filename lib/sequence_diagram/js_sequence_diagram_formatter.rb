@@ -25,12 +25,16 @@ module SequenceDiagram
 
       def to_s
         if @object.is_a?(Class)
-          @object.to_s.gsub('::', '~')
+          format_class(@object)
         else
           self.class.instance_registry.register(@object)
           instance_number = self.class.instance_registry.number_for(@object)
-          "#{@object.class.to_s.gsub('::', '~')}(#{instance_number})"
+          "#{format_class(@object.class)}(#{instance_number})"
         end
+      end
+
+      def format_class(klass)
+        klass.to_s.gsub('::', '~')
       end
     end
 
