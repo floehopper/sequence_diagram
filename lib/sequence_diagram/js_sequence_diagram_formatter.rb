@@ -1,3 +1,5 @@
+require 'sequence_diagram/method_invocation/actor'
+
 module SequenceDiagram
   class JsSequenceDiagramFormatter
     class InstanceRegistry
@@ -19,22 +21,28 @@ module SequenceDiagram
         attr_accessor :instance_registry
       end
 
-      def initialize(object)
-        @object = object
+      def initialize(actor)
+        @actor = actor
+      end
+
+      def object
+        @actor.object
       end
 
       def to_s
-        if @object.is_a?(Class)
-          format_class(@object)
+        if @actor.is_a?(SequenceDiagram::MethodInvocation::Actor::Library)
+          'Library'
+        elsif object.is_a?(Class)
+          format_class(object)
         else
-          self.class.instance_registry.register(@object)
-          instance_number = self.class.instance_registry.number_for(@object)
-          "#{format_class(@object.class)}(#{instance_number})"
+          self.class.instance_registry.register(object)
+          instance_number = self.class.instance_registry.number_for(object)
+          "#{format_class(object.class)}(#{instance_number})"
         end
       end
 
       def format_class(klass)
-        klass.to_s.gsub('::', '~')
+        klass.to_s.gsub('::', '~').sub(%r{#<Class\:0x\w+>}, 'AnonymouseClass')
       end
     end
 
@@ -46,12 +54,12 @@ module SequenceDiagram
     def write(events)
       events.each do |event|
         if event.call?
-          from = Decorator.new(event.invoker.object)
-          to = Decorator.new(event.invokee.object)
+          from = Decorator.new(event.invoker)
+          to = Decorator.new(event.invokee)
           @io.puts "#{from}->#{to}: #{event.method_name}"
         else
-          from = Decorator.new(event.invokee.object)
-          to = Decorator.new(event.invoker.object)
+          from = Decorator.new(event.invokee)
+          to = Decorator.new(event.invoker)
           unless event.invokee.object == event.invoker.object
             @io.puts "#{from}-->#{to}: #{event.method_name}"
           end

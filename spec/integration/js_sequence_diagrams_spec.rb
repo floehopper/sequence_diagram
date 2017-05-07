@@ -92,6 +92,19 @@ describe 'js-sequence-diagrams' do
         'ClassB-->ClassA: class_method_3'
       ])
     end
+
+    context 'but ClassB is in a library' do
+      let(:paths) { ['spec/fixtures/class_a.rb', 'spec/fixtures/class_c.rb'] }
+
+      it 'generates nested lines for the calls and the returns' do
+        expect(output_from(&block)).to eq([
+          'ClassA->Library: class_method_3',
+          'Library->ClassC: class_method_1',
+          'ClassC-->Library: class_method_1',
+          'Library-->ClassA: class_method_3'
+        ])
+      end
+    end
   end
 
   context 'when method is called on namespaced class' do
@@ -110,6 +123,8 @@ describe 'js-sequence-diagrams' do
   def output_from(&block)
     tracer.trace(&block)
     events = filter.filter(tracer.events)
+    events.shift
+    events.pop
     formatter.write(events)
     io.rewind
     io.each_line.map(&:chomp)

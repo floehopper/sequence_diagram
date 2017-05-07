@@ -1,6 +1,7 @@
 module SequenceDiagram
   module MethodInvocation
     class Event
+attr_accessor :invoker, :invokee
       attr_reader :invoker, :invokee, :method_name
 
       def initialize(invoker:, invokee:, method_name:)

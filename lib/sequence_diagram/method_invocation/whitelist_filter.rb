@@ -1,3 +1,4 @@
+require 'sequence_diagram/method_invocation/actor'
 require 'pathname'
 
 module SequenceDiagram
@@ -8,11 +9,21 @@ module SequenceDiagram
       end
 
       def filter(events)
-        events.select { |e| whitelisted?(e) }
+        Enumerator.new do |yielder|
+          events.each do |event|
+            if outside_application?(event.invoker)
+              event.invoker = Actor::Library.new
+            end
+            if outside_application?(event.invokee)
+              event.invokee = Actor::Library.new
+            end
+            yielder << event
+          end
+        end.to_a
       end
 
-      def whitelisted?(event)
-        event.paths.all? { |p| @paths.include?(Pathname.new(p).realpath) }
+      def outside_application?(actor)
+        !@paths.include?(Pathname.new(actor.path).realpath)
       end
     end
   end
