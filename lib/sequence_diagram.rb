@@ -1,0 +1,2 @@
+module SequenceDiagram
+end
