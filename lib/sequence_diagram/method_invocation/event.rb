@@ -17,6 +17,10 @@ attr_accessor :invoker, :invokee
       def paths
         [invoker, invokee].map(&:path)
       end
+
+      def inside_application?(path_discriminator)
+        path_discriminator.inside_application?(invoker) || path_discriminator.inside_application?(invokee)
+      end
     end
   end
 end

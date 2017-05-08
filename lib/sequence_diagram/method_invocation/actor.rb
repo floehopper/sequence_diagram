@@ -1,9 +1,7 @@
 module SequenceDiagram
   module MethodInvocation
     class Actor
-      class Library < Actor
-        def initialize; end
-      end
+      class Library; end
 
       attr_reader :object, :path
 

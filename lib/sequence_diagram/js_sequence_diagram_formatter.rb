@@ -30,9 +30,7 @@ module SequenceDiagram
       end
 
       def to_s
-        if @actor.is_a?(SequenceDiagram::MethodInvocation::Actor::Library)
-          'Library'
-        elsif object.is_a?(Class)
+        if object.is_a?(Class)
           format_class(object)
         else
           self.class.instance_registry.register(object)
@@ -42,7 +40,7 @@ module SequenceDiagram
       end
 
       def format_class(klass)
-        klass.to_s.gsub('::', '~').sub(%r{#<Class\:0x\w+>}, 'AnonymouseClass')
+        klass.to_s.sub('SequenceDiagram::MethodInvocation::Actor::Library', 'Library').gsub('::', '~').sub(%r{#<Class\:0x\w+>}, 'AnonymouseClass')
       end
     end
 

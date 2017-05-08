@@ -4,26 +4,46 @@ require 'pathname'
 module SequenceDiagram
   module MethodInvocation
     class WhitelistFilter
+      class PathDiscriminator
+        def initialize(paths)
+          @paths = paths.map { |p| Pathname.new(p).realpath }
+        end
+
+        def inside_application?(actor)
+          @paths.include?(Pathname.new(actor.path).realpath)
+        end
+      end
+
       def initialize(paths)
-        @paths = paths.map { |p| Pathname.new(p).realpath }
+        @path_discriminator = PathDiscriminator.new(paths)
       end
 
       def filter(events)
+        current_library_object = []
+        library_objects = []
         Enumerator.new do |yielder|
           events.each do |event|
-            if outside_application?(event.invoker)
-              event.invoker = Actor::Library.new
+            if event.inside_application?(@path_discriminator)
+              if event.exiting_application?(@path_discriminator)
+                if event.call?
+                  actor = Actor.new(object: Actor::Library.new, path: '')
+                else
+                  actor = library_objects.pop
+                end
+                event.target = actor
+                current_library_object.push(actor)
+              end
+              if event.entering_application?(@path_discriminator)
+                actor = current_library_object.pop
+                event.source = actor
+                if event.call?
+                  library_objects.push(actor)
+                end
+              end
+              yielder << event
             end
-            if outside_application?(event.invokee)
-              event.invokee = Actor::Library.new
-            end
-            yielder << event
           end
         end.to_a
-      end
-
-      def outside_application?(actor)
-        !@paths.include?(Pathname.new(actor.path).realpath)
       end
     end
   end

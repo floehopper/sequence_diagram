@@ -93,15 +93,15 @@ describe 'js-sequence-diagrams' do
       ])
     end
 
-    context 'but ClassB is in a library' do
+    context 'but ClassB is in library code' do
       let(:paths) { ['spec/fixtures/class_a.rb', 'spec/fixtures/class_c.rb'] }
 
       it 'generates nested lines for the calls and the returns' do
         expect(output_from(&block)).to eq([
-          'ClassA->Library: class_method_3',
-          'Library->ClassC: class_method_1',
-          'ClassC-->Library: class_method_1',
-          'Library-->ClassA: class_method_3'
+          'ClassA->Library(1): class_method_3',
+          'Library(1)->ClassC: class_method_1',
+          'ClassC-->Library(1): class_method_1',
+          'Library(1)-->ClassA: class_method_3'
         ])
       end
     end
