@@ -12,7 +12,8 @@ module SequenceDiagram
       end
 
       def number_for(instance)
-        @classes_vs_instances[instance.class].to_a.index(instance) + 1
+        index = @classes_vs_instances[instance.class].to_a.index(instance)
+        (index || 0) + 1
       end
     end
 
