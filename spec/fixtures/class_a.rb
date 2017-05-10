@@ -22,6 +22,10 @@ class ClassA
     when :scenario_6
       ClassB.class_method_3
     when :scenario_7
+      ClassB.class_method_4
+    when :scenario_8
+      ClassB.class_method_5
+    when :scenario_9
       InnerClass.class_method_1
     end
   end

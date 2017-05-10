@@ -3,6 +3,9 @@ require 'sequence_diagram/method_invocation/event'
 module SequenceDiagram
   module MethodInvocation
     class CallEvent < Event
+      alias_method :source, :invoker
+      alias_method :target, :invokee
+
       alias_method :source=, :invoker=
       alias_method :target=, :invokee=
 

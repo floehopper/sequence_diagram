@@ -107,9 +107,88 @@ describe 'js-sequence-diagrams' do
     end
   end
 
-  context 'when method is called on namespaced class' do
+  context 'when three methods are called from another class each inside the last' do
     let(:block) { -> {
       ClassA.execute(:scenario_7)
+    }}
+
+    it 'generates nested lines for the calls and the returns' do
+      expect(output_from(&block)).to eq([
+        'ClassA->ClassB: class_method_4',
+        'ClassB->ClassC: class_method_2',
+        'ClassC->ClassD: class_method_1',
+        'ClassD-->ClassC: class_method_1',
+        'ClassC-->ClassB: class_method_2',
+        'ClassB-->ClassA: class_method_4'
+      ])
+    end
+
+    context 'but ClassB & ClassC are in library code' do
+      let(:paths) { ['spec/fixtures/class_a.rb', 'spec/fixtures/class_d.rb'] }
+
+      it 'generates nested lines for the calls and the returns' do
+        expect(output_from(&block)).to eq([
+          'ClassA->Library(1): class_method_4',
+          'Library(1)->ClassD: class_method_1',
+          'ClassD-->Library(1): class_method_1',
+          'Library(1)-->ClassA: class_method_4'
+        ])
+      end
+    end
+  end
+
+  context 'when four methods are called from another class each inside the last' do
+    let(:block) { -> {
+      ClassA.execute(:scenario_8)
+    }}
+
+    it 'generates nested lines for the calls and the returns' do
+      expect(output_from(&block)).to eq([
+        'ClassA->ClassB: class_method_5',
+        'ClassB->ClassC: class_method_3',
+        'ClassC->ClassD: class_method_2',
+        'ClassD->ClassE: class_method_1',
+        'ClassE-->ClassD: class_method_1',
+        'ClassD-->ClassC: class_method_2',
+        'ClassC-->ClassB: class_method_3',
+        'ClassB-->ClassA: class_method_5'
+      ])
+    end
+
+    context 'but ClassB, ClassC & CLassD are in library code' do
+      let(:paths) { ['spec/fixtures/class_a.rb', 'spec/fixtures/class_e.rb'] }
+
+      it 'generates nested lines for the calls and the returns' do
+        expect(output_from(&block)).to eq([
+          'ClassA->Library(1): class_method_5',
+          'Library(1)->ClassE: class_method_1',
+          'ClassE-->Library(1): class_method_1',
+          'Library(1)-->ClassA: class_method_5'
+        ])
+      end
+    end
+
+    context 'but ClassB & ClassD are in library code' do
+      let(:paths) { ['spec/fixtures/class_a.rb', 'spec/fixtures/class_c.rb', 'spec/fixtures/class_e.rb'] }
+
+      it 'generates nested lines for the calls and the returns' do
+        expect(output_from(&block)).to eq([
+          'ClassA->Library(1): class_method_5',
+          'Library(1)->ClassC: class_method_3',
+          'ClassC->Library(2): class_method_2',
+          'Library(2)->ClassE: class_method_1',
+          'ClassE-->Library(2): class_method_1',
+          'Library(2)-->ClassC: class_method_2',
+          'ClassC-->Library(1): class_method_3',
+          'Library(1)-->ClassA: class_method_5'
+        ])
+      end
+    end
+  end
+
+  context 'when method is called on namespaced class' do
+    let(:block) { -> {
+      ClassA.execute(:scenario_9)
     }}
 
     it 'replaces double-colons with tildes' do

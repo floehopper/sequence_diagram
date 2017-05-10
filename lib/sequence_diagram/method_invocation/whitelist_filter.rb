@@ -19,7 +19,7 @@ module SequenceDiagram
       end
 
       def filter(events)
-        current_library_object = []
+        current_library_object = [Actor.new(object: Actor::Library.new, path: '')]
         library_objects = []
         Enumerator.new do |yielder|
           events.each do |event|
