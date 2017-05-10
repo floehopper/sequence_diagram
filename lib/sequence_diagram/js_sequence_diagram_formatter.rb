@@ -59,7 +59,7 @@ module SequenceDiagram
         else
           from = Decorator.new(event.invokee)
           to = Decorator.new(event.invoker)
-          unless event.invokee.object == event.invoker.object
+          unless event.invokee.object.object_id == event.invoker.object.object_id
             @io.puts "#{from}-->#{to}: #{event.method_name}"
           end
         end
