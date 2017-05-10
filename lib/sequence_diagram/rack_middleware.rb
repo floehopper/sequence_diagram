@@ -4,6 +4,16 @@ require 'sequence_diagram/js_sequence_diagram_formatter'
 
 module SequenceDiagram
   class RackMiddleware
+    class PathDiscriminator
+      def initialize
+        @cleaner = Rails::BacktraceCleaner.new
+      end
+
+      def inside_application?(actor)
+        @cleaner.clean([actor.path]).any?
+      end
+    end
+
     def initialize(app)
       @app = app
       @root = Rails.root.join(File.join(%w(tmp traces)))
@@ -24,8 +34,8 @@ module SequenceDiagram
         result = @app.call(env)
       end
 
-      cleaner = Rails::BacktraceCleaner.new
-      filter = MethodInvocation::Filter.new(cleaner)
+      discriminator = PathDiscriminator.new
+      filter = MethodInvocation::Filter.new(discriminator)
       events = filter.filter(tracer.events)
 
       File.open(directory.join(filename), 'w') do |file|

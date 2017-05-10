@@ -51,6 +51,7 @@ module SequenceDiagram
 
     def write(events)
       events.each do |event|
+        next if event.invokee.nil? || event.invoker.nil?
         if event.call?
           from = Decorator.new(event.invoker)
           to = Decorator.new(event.invokee)

@@ -1,6 +1,7 @@
 require 'spec_helper'
-require 'sequence_diagram/method_invocation/whitelist_filter'
+require 'sequence_diagram/method_invocation/filter'
 require 'sequence_diagram/method_invocation/tracer'
+require 'sequence_diagram/method_invocation/whitelist_path_discriminator'
 require 'sequence_diagram/js_sequence_diagram_formatter'
 require 'fixtures/class_a'
 
@@ -8,7 +9,8 @@ describe 'js-sequence-diagrams' do
   let(:tracer) { SequenceDiagram::MethodInvocation::Tracer.new }
 
   let(:paths) { Dir['spec/fixtures/class_*.rb'] }
-  let(:filter) { SequenceDiagram::MethodInvocation::WhitelistFilter.new(paths) }
+  let(:discriminator) { SequenceDiagram::MethodInvocation::WhitelistPathDiscriminator.new(paths) }
+  let(:filter) { SequenceDiagram::MethodInvocation::Filter.new(discriminator) }
 
   let(:io) { StringIO.new }
   let(:formatter) { SequenceDiagram::JsSequenceDiagramFormatter.new(io) }
