@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sequence Diagram</title>
+
+    <script src="bower_components/bower-webfontloader/webfont.js"></script>
+    <script src="bower_components/snap.svg/dist/snap.svg-min.js"></script>
+    <script src="bower_components/underscore/underscore-min.js"></script>
+    <script src="bower_components/js-sequence-diagrams/dist/sequence-diagram-min.js"></script>
+  </head>
+  <body>
+    <div id="input">
+      Library(1)->SearchController(1): school_postcode_answer
+      SearchController(1)->Library(2): params
+      Library(2)-->SearchController(1): params
+      SearchController(1)->Library(3): permit
+      Library(3)-->SearchController(1): permit
+      SearchController(1)->Library(4): branches_path
+      SearchController(1)->Library(5): redirect_to
+      Library(5)-->SearchController(1): redirect_to
+      SearchController(1)-->Library(1): school_postcode_answer
+    </div>
+
+    <div id="diagram"></div>
+
+    <script>
+      var d = Diagram.parse(document.getElementById('input').textContent);
+      d.drawSVG('diagram');
+    </script>
+  </body>
+</html>
